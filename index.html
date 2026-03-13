@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WealthSim — Build Your Future</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 1: HOME
+  ════════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen">
+    <div class="home-glow"></div>
+    <div class="home-content">
+      <div class="game-title">WealthSim</div>
+      <p class="tagline">
+        Make financial decisions across your lifetime.<br>
+        Student → Job → Family → Retirement.<br>
+        Can you reach financial independence?
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; max-width:340px; margin:0 auto">
+        <button class="btn btn-primary" onclick="showScreen('profile')">
+          Start Your Journey
+        </button>
+        <button class="btn btn-ghost" onclick="renderLeaderboard(); showScreen('leaderboard')">
+          View Leaderboard
+        </button>
+      </div>
+
+      <!-- Life stage preview pills -->
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:40px; flex-wrap:wrap">
+        <span style="padding:6px 14px; background:rgba(123,110,246,0.1); border:1px solid rgba(123,110,246,0.3); border-radius:20px; font-size:12px; color:#9183f7">🎓 Student</span>
+        <span style="padding:6px 14px; background:rgba(45,212,160,0.08); border:1px solid rgba(45,212,160,0.2); border-radius:20px; font-size:12px; color:#2dd4a0">💼 First Job</span>
+        <span style="padding:6px 14px; background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.2); border-radius:20px; font-size:12px; color:#f5a623">🏠 Family</span>
+        <span style="padding:6px 14px; background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.2); border-radius:20px; font-size:12px; color:#e05252">🌅 Retirement</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 2: PROFILE SETUP
+  ════════════════════════════════════════════════ -->
+  <div id="screen-profile" class="screen">
+    <div class="card">
+      <h2 style="font-family:'Syne',sans-serif; font-size:22px; margin-bottom:6px">Create your profile</h2>
+      <p style="font-size:13px; color:#6b7a92; margin-bottom:24px">Your decisions will shape your financial future.</p>
+
+      <div class="input-group">
+        <label>Your name</label>
+        <input type="text" id="player-name" placeholder="e.g. Priya Sharma" maxlength="24">
+      </div>
+
+      <div class="input-group">
+        <label>Financial goal</label>
+        <select id="player-goal">
+          <option value="retire_early">Retire by age 45</option>
+          <option value="buy_house">Own a house by 35</option>
+          <option value="financial_free">Reach ₹1 Crore net worth</option>
+          <option value="debt_free">Stay completely debt free</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" onclick="startGame()" style="margin-top:8px">
+        Begin — Age 18 🎓
+      </button>
+      <button class="btn btn-ghost" onclick="showScreen('home')">Back</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 3: MAIN GAME
+  ════════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+
+    <!-- Stage header -->
+    <div class="stage-header">
+      <span class="stage-emoji" id="stage-emoji">🎓</span>
+      <div class="stage-info">
+        <div class="stage-tag" id="stage-tag">Stage 1 · Student</div>
+        <div class="player-age" id="player-age">Age 18</div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-track" style="width:100%; max-width:520px; margin-bottom:14px">
+      <div class="progress-fill" id="stage-bar-fill" style="width:0%"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="s-label">Net Worth</div>
+        <div class="s-value" id="stat-networth">₹0</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Debt</div>
+        <div class="s-value debt" id="stat-debt">₹0</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Credit</div>
+        <div class="s-value" id="stat-credit">650</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">Happiness</div>
+        <div class="s-value" id="stat-happy">70%</div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="badge-row" id="badge-row"></div>
+
+    <!-- Decision card -->
+    <div class="decision-card">
+      <h2 id="decision-title">Loading...</h2>
+      <p id="decision-desc"></p>
+      <div class="choices" id="choices"></div>
+    </div>
+
+    <!-- AI Advisor -->
+    <div class="advisor-box">
+      <div class="advisor-label">AI Advisor</div>
+      <div id="advisor-tip">Analyzing your financial profile...</div>
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 4: RANDOM EVENT
+  ════════════════════════════════════════════════ -->
+  <div id="screen-event" class="screen">
+    <div class="event-card">
+      <div class="event-icon-wrap bad" id="event-icon-wrap">
+        <span id="event-icon">⚡</span>
+      </div>
+      <h2 id="event-title">Market Crash!</h2>
+      <p id="event-desc">Something unexpected happened to your finances.</p>
+      <div class="event-impact bad" id="event-impact">Net Worth -₹80,000</div>
+      <button class="btn btn-primary" onclick="dismissEvent()">Continue Playing</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 5: END / RESULTS
+  ════════════════════════════════════════════════ -->
+  <div id="screen-end" class="screen">
+    <div class="card" style="text-align:center; max-width:440px">
+
+      <p style="font-size:12px; color:#6b7a92; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px">Final Results</p>
+      <h2 id="end-name" style="font-size:20px; margin-bottom:20px">Your Result</h2>
+
+      <div class="end-grade-circle" id="end-grade">A</div>
+      <p id="end-grade-msg" style="color:#9183f7; font-weight:600; margin-bottom:4px">Smart Investor</p>
+      <p style="font-size:28px; font-family:'Syne',sans-serif; font-weight:800; color:#fff; margin-bottom:4px">
+        <span id="end-score">0</span>
+      </p>
+      <p style="font-size:12px; color:#6b7a92; margin-bottom:20px">points</p>
+
+      <div class="end-stats-grid">
+        <div class="end-stat">
+          <div class="label">Net Worth</div>
+          <div class="value" id="end-networth">₹0</div>
+        </div>
+        <div class="end-stat">
+          <div class="label">Credit</div>
+          <div class="value" id="end-credit">650</div>
+        </div>
+        <div class="end-stat">
+          <div class="label">Happiness</div>
+          <div class="value" id="end-happiness">70%</div>
+        </div>
+      </div>
+
+      <div style="text-align:left; margin-bottom:20px">
+        <div class="section-title">Badges Earned</div>
+        <div id="end-badges" style="display:flex; flex-wrap:wrap; gap:6px"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="renderLeaderboard(); showScreen('leaderboard')">
+        See Leaderboard
+      </button>
+      <button class="btn btn-ghost" onclick="showScreen('home')">Play Again</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCREEN 6: LEADERBOARD
+  ════════════════════════════════════════════════ -->
+  <div id="screen-leaderboard" class="screen">
+    <div style="width:100%; max-width:480px">
+      <h2 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:800; margin-bottom:4px">Leaderboard</h2>
+      <p style="font-size:13px; color:#6b7a92; margin-bottom:20px">Top financial legends</p>
+      <div id="lb-list"></div>
+      <button class="btn btn-ghost" style="margin-top:16px" onclick="showScreen('home')">Back to Home</button>
+    </div>
+  </div>
+
+
+  <script src="game.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
