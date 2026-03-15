@@ -19,6 +19,7 @@ function showScreen(id) {
 
 // ── Format Helpers ───────────────────────────────────────────
 function formatMoney(n) {
+  if (n === undefined || n === null || isNaN(n)) return '₹0';
   if (n === 0) return '₹0';
   const abs = Math.abs(n);
   const sign = n < 0 ? '-' : '';
@@ -106,8 +107,28 @@ function renderGameScreen() {
 }
 
 // ── Handle a Player Choice ───────────────────────────────────
-function handleChoice(choiceId) {
+async function handleChoice(choiceId) {
   applyChoice(choiceId);
+
+  try {
+    const s = getState();
+    const res = await fetch('http://127.0.0.1:8000/make-decision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        decision_id: choiceId,
+        stage: s.stage,
+        net_worth: s.netWorth,
+        debt: s.debt,
+        credit_score: s.creditScore,
+        happiness: s.happiness
+      })
+    });
+    const data = await res.json();
+    console.log('Decision response:', data);
+  } catch (err) {
+    console.log('Backend offline, using local engine');
+  }
 
   if (isGameOver()) {
     renderEndScreen();
@@ -216,9 +237,22 @@ function fetchAdvisorTip(s) {
 }
 
 // ── Start Game ───────────────────────────────────────────────
-function startGame() {
+async function startGame() {
   const name = document.getElementById('player-name').value.trim() || 'Player';
   const goal = document.getElementById('player-goal').value;
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/start-game', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ player_name: name, goal: goal })
+    });
+    const data = await res.json();
+    console.log('Game started:', data);
+  } catch (err) {
+    console.log('Backend offline, using local game');
+  }
+
   initGame(name, goal);
   prevState = {};
   renderGameScreen();
